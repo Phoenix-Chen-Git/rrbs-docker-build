@@ -1,24 +1,36 @@
-FROM ubuntu:22.04
+FROM ubuntu:20.04
 
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
-    wget curl unzip git build-essential zlib1g-dev \
-    python3 python3-pip openjdk-11-jre \
-    bowtie2 samtools bedtools \
+    wget curl unzip git build-essential zlib1g-dev libbz2-dev liblzma-dev \
+    python3 python3-pip openjdk-11-jre bowtie2 samtools bedtools \
     && apt-get clean
 
 # Install Trim Galore
-RUN wget https://github.com/FelixKrueger/TrimGalore/archive/refs/tags/0.6.10.zip && \
-    unzip 0.6.10.zip && mv TrimGalore-0.6.10 /opt/trim_galore
+RUN wget https://github.com/FelixKrueger/TrimGalore/archive/refs/heads/master.zip \
+    && unzip master.zip && mv TrimGalore-master /opt/trim_galore
 
 # Install Bismark
-RUN wget https://github.com/FelixKrueger/Bismark/archive/refs/tags/0.24.0.zip && \
-    unzip 0.24.0.zip && mv Bismark-0.24.0 /opt/bismark
+RUN wget https://github.com/FelixKrueger/Bismark/archive/refs/heads/master.zip -O bismark.zip \
+    && unzip bismark.zip && mv Bismark-master /opt/bismark
 
-# Install deeptools (for bamCoverage)
-RUN pip3 install deeptools
+# Install FastQC (required by Trim Galore)
+RUN wget https://www.bioinformatics.babraham.ac.uk/projects/fastqc/fastqc_v0.11.9.zip \
+    && unzip fastqc_v0.11.9.zip && chmod +x FastQC/fastqc && mv FastQC /opt/fastqc
 
-ENV PATH="/opt/trim_galore:/opt/bismark:$PATH"
+# Add to PATH
+ENV PATH="/opt/trim_galore:/opt/bismark:/opt/fastqc:${PATH}"
 
-WORKDIR /data
+# Install bedGraphToBigWig (UCSC tool)
+RUN mkdir -p /opt/ucsc && \
+    wget http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/bedGraphToBigWig -P /opt/ucsc && \
+    chmod +x /opt/ucsc/bedGraphToBigWig && \
+    ln -s /opt/ucsc/bedGraphToBigWig /usr/local/bin/bedGraphToBigWig
 
-CMD ["/bin/bash"]
+# Add your pipeline script
+COPY rrbs_to_bigwig.sh /usr/local/bin/rrbs_to_bigwig.sh
+RUN chmod +x /usr/local/bin/rrbs_to_bigwig.sh
+
+ENTRYPOINT ["bash", "/usr/local/bin/rrbs_to_bigwig.sh"]
