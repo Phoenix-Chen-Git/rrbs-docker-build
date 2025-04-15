@@ -57,3 +57,19 @@ sort -k1,1 -k2,2n $bedGraph > sorted.bedGraph
 bedGraphToBigWig sorted.bedGraph hg19.chrom.sizes merged.bigWig
 
 echo "✅ Pipeline completed. Final output: /data/aligned/merged.bigWig"
+
+# Step 9: Upload to S3
+echo "☁️ Uploading merged.bigWig to S3..."
+
+S3_BUCKET="graduationcsy"   # ✅ 改成你自己的 bucket
+S3_PREFIX="rrbs-results"       # ✅ 可选，改成你希望的路径
+DATESTAMP=$(date +%Y%m%d_%H%M%S)
+
+if [ -f merged.bigWig ]; then
+    aws s3 cp merged.bigWig s3://${S3_BUCKET}/${S3_PREFIX}/merged_${DATESTAMP}.bigWig
+    echo "✅ Upload successful: s3://${S3_BUCKET}/${S3_PREFIX}/merged_${DATESTAMP}.bigWig"
+else
+    echo "❌ Error: merged.bigWig not found, upload skipped."
+    exit 1
+fi
+
