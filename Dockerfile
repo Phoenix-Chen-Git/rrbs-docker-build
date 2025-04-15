@@ -11,6 +11,7 @@ RUN apt-get update && apt-get install -y \
 # Install Trim Galore
 RUN wget https://github.com/FelixKrueger/TrimGalore/archive/refs/heads/master.zip \
     && unzip master.zip && mv TrimGalore-master /opt/trim_galore
+RUN apt-get update && apt-get install -y awscli
 
 # Install Bismark
 RUN wget https://github.com/FelixKrueger/Bismark/archive/refs/heads/master.zip -O bismark.zip \
