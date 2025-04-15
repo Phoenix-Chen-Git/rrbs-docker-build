@@ -33,5 +33,6 @@ RUN mkdir -p /opt/ucsc && \
 # Add your pipeline script
 COPY rrbs_to_bigwig.sh /usr/local/bin/rrbs_to_bigwig.sh
 RUN chmod +x /usr/local/bin/rrbs_to_bigwig.sh
+RUN which sh && which bash
 
 ENTRYPOINT ["bash", "/usr/local/bin/rrbs_to_bigwig.sh"]
