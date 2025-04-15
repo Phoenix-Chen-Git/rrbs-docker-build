@@ -7,6 +7,7 @@ RUN apt-get update && apt-get install -y \
     wget curl unzip git build-essential zlib1g-dev libbz2-dev liblzma-dev \
     python3 python3-pip openjdk-11-jre bowtie2 samtools bedtools \
     && apt-get clean
+RUN pip3 install cutadapt
 
 # Install Trim Galore
 RUN wget https://github.com/FelixKrueger/TrimGalore/archive/refs/heads/master.zip \
