@@ -8,7 +8,7 @@ RUN apt-get update && apt-get install -y \
     zlib1g-dev libbz2-dev liblzma-dev libncurses5-dev libncursesw5-dev \
     python3 python3-pip openjdk-11-jre \
     bowtie2 samtools bedtools awscli \
-    perl gzip \
+    perl gzip parallel \
     && apt-get clean
 
 # Install cutadapt (for Trim Galore)
